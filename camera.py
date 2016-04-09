@@ -1,12 +1,9 @@
-# sudo pip install dropbox
-# Create dropbox app at https://www.dropbox.com/developers/apps for Dropbox API with App Folder access type
-# Generate an access token for your user to access this app folder
-
+from os import getenv
 from subprocess import call
 
 import dropbox
 
-ACCESS_TOKEN = ''
+
 DROPBOX_IMAGE_NAME = '/img.jpeg'
 
 
@@ -16,13 +13,19 @@ def generate():
 
 
 def upload(file_name):
-    client = dropbox.client.DropboxClient(ACCESS_TOKEN)
+    access_token = getenv('DROPBOX_TOKEN')
+    if not access_token:
+        raise ValueError('DROPBOX_TOKEN not set')
+    client = dropbox.client.DropboxClient(access_token)
+    
+    # Get metadata of the current version of image
     try:
         file_metadata = client.metadata(DROPBOX_IMAGE_NAME)
     except dropbox.rest.ErrorResponse:
         file_metadata = {}
     parent_rev = file_metadata.get('rev')
 
+    # Upload new version of image
     file_obj = open(file_name, 'rb')
     try:
         response = client.put_file(full_path=DROPBOX_IMAGE_NAME, file_obj=file_obj, parent_rev=parent_rev)
