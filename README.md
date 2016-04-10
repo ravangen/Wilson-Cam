@@ -37,6 +37,19 @@ All components used are older versions and can easily be replaced by something n
 1. Install Jessie Raspbian to the USB drive using BerryBoot
 1. Configure wireless adapter to connect to wifi so that a wired connection is not necessary
 1. `git clone https://github.com/ravangen/Wilson-Cam.git` this repository and `cd Wilson-Cam`
+  - The instructions assume you are cloning to `$HOME` (`~`, the default directory)
 1. Install python package dependencies: `pip install -r requirements.txt`
 1. Create a Dropbox app at https://www.dropbox.com/developers/apps/create using the "Dropbox API", "App Folder" access type, and an app name of your choice
 1. Open this new Dropbox app and generate a OAuth 2 access token to be used to upload the image
+  - Keep this value secret, anyone can view/edit your files in the app folder with this token
+1. Generate an image by running `DROPBOX_TOKEN=<YOUR-TOKEN-HERE> python $HOME/Wilson-Cam/camera.py`
+  - Should create `image.jpeg` in the `Wilson-Cam` local folder
+  - Should upload this image to the Dropbox app folder named `img.jpeg`
+
+### Schedule the Script
+1. Run `crontab -e` to edit tasks run by `cron`
+1. Add `*/5 * * * * DROPBOX_TOKEN=<YOUR-TOKEN-HERE> python $HOME/Wilson-Cam/camera.py >> $HOME/Wilson-Cam/camera.log 2>&1`
+  - `*/5` is the frequency to run, every 5 minutes (`*/1` would be every minute)
+  - Writes info and error output to a log file `camera.log` in `$HOME/Wilson-Cam`
+1. Save file changes
+1. Confirm your changes with `crontab -l` and watch `camera.log` for updates about what has happened

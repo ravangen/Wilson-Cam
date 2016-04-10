@@ -1,11 +1,17 @@
+from __future__ import print_function
 from os import getenv, path
 from subprocess import call
+import sys
 
 import dropbox
 
 
 DROPBOX_IMAGE_NAME = '/img.jpeg'
 FSWEBCAM_CONFIG_NAME = 'fswebcam.config'
+
+
+def error(*objs):
+    print(*objs, file=sys.stderr)
 
 
 def generate(file_name='image.jpeg'):
@@ -33,9 +39,9 @@ def upload(file_path):
     file_obj = open(file_path, 'rb')
     try:
         response = client.put_file(full_path=DROPBOX_IMAGE_NAME, file_obj=file_obj, parent_rev=parent_rev)
-        print 'uploaded: ', response
+        print('uploaded: ', response)
     except dropbox.rest.ErrorResponse as e:
-        print 'error: ', e.body
+        error('error: ', e.body)
     finally:
         file_obj.close()
 
